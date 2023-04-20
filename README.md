@@ -1,0 +1,2 @@
+- Traning NodeJS Adamo
+- Checkout branch to solve training day
