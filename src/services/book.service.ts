@@ -51,7 +51,7 @@ class BookService {
     const rentedBooks: any = await this.getBookByUserId(userId);
     const bookNumber: number = rentedBooks.length;
     if (bookNumber >= 3) {
-      throw new HttpException(StatusCodes.NOT_FOUND, "Don't rent >= 3 books");
+      throw new HttpException(StatusCodes.BAD_REQUEST, "Don't rent >= 3 books");
     }
     const book: any = await this.getBookById(bookId);
     await user.addBook(book, { through: rentBookDto });
