@@ -24,7 +24,6 @@ class BookService {
 
   async updateBookById(bookId: string, updateBookDto: Partial<UpdateBookDto>) {
     const book = await this.getBookById(bookId);
-    console.log(book);
     if (!book) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Book not found");
     }
@@ -51,7 +50,6 @@ class BookService {
     const user: any = await userService.getUserById(userId);
     const rentedBooks: any = await this.getBookByUserId(userId);
     const bookNumber: number = rentedBooks.length;
-    console.log(rentedBooks);
     if (bookNumber >= 3) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Don't rent >= 3 books");
     }
