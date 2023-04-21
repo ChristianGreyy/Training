@@ -44,7 +44,7 @@ class UserController {
   async updateUserById(req: Request, res: Response, next: NextFunction) {
     try {
       await userService.updateUserById(req.params.userId, req.body);
-      return res.status(StatusCodes.CREATED).json({
+      return res.status(StatusCodes.OK).json({
         message: "Update user successfully",
       });
     } catch (err) {
@@ -55,7 +55,7 @@ class UserController {
   async deleteUserById(req: Request, res: Response, next: NextFunction) {
     try {
       await userService.deleteUserById(req.params.userId);
-      return res.status(StatusCodes.CREATED).json({
+      return res.status(StatusCodes.NO_CONTENT).json({
         message: "Delete user successfully",
       });
     } catch (err) {

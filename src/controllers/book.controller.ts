@@ -44,7 +44,7 @@ class BookController {
   async updateBookById(req: Request, res: Response, next: NextFunction) {
     try {
       await bookService.updateBookById(req.params.bookId, req.body);
-      return res.status(StatusCodes.CREATED).json({
+      return res.status(StatusCodes.OK).json({
         message: "Update book successfully",
       });
     } catch (err) {
@@ -55,7 +55,7 @@ class BookController {
   async deleteBookById(req: Request, res: Response, next: NextFunction) {
     try {
       await bookService.deleteBookById(req.params.bookId);
-      return res.status(StatusCodes.CREATED).json({
+      return res.status(StatusCodes.NO_CONTENT).json({
         message: "Delete book successfully",
       });
     } catch (err) {
