@@ -63,21 +63,6 @@ class BookController {
     }
   }
 
-  async rentBook(req: Request, res: Response, next: NextFunction) {
-    try {
-      await bookService.rentBook(
-        req.params.bookId,
-        req.params.userId,
-        req.body
-      );
-      return res.status(StatusCodes.CREATED).json({
-        message: "Rent book successfully",
-      });
-    } catch (err) {
-      next(err);
-    }
-  }
-
   async getBookByUserId(req: Request, res: Response, next: NextFunction) {
     try {
       const books = await bookService.getBookByUserId(req.params.userId);

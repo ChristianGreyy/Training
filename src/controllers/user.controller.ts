@@ -62,6 +62,21 @@ class UserController {
       next(err);
     }
   }
+
+  async rentBook(req: Request, res: Response, next: NextFunction) {
+    try {
+      await userService.rentBook(
+        req.params.bookId,
+        req.params.userId,
+        req.body
+      );
+      return res.status(StatusCodes.CREATED).json({
+        message: "Rent book successfully",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export default new UserController();

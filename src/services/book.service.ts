@@ -1,25 +1,24 @@
 import CreateBookDto from "../dtos/book/create-book.dto";
 import UpdateBookDto from "../dtos/book/update-book.dto";
-import Book from "../models/book.model";
 import { StatusCodes } from "http-status-codes";
 import HttpException from "../configs/HttpException";
 import userService from "./user.service";
 import RentBookDto from "../dtos/book/rent-book.dto";
-import User from "../models/user.model";
 import { Sequelize } from "sequelize";
+const db = require("../models/index.js");
 
 class BookService {
   async getBooks() {
-    return await Book.findAll();
+    return await db.Book.findAll();
   }
 
   async getBookById(bookId: string) {
-    const book = await Book.findByPk(bookId);
+    const book = await db.Book.findByPk(bookId);
     return book;
   }
 
   async createBook(createBookDto: Partial<CreateBookDto>) {
-    return await Book.create(createBookDto);
+    return await db.Book.create(createBookDto);
   }
 
   async updateBookById(bookId: string, updateBookDto: Partial<UpdateBookDto>) {
@@ -27,7 +26,7 @@ class BookService {
     if (!book) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Book not found");
     }
-    return await Book.update(updateBookDto, {
+    return await db.Book.update(updateBookDto, {
       where: {
         id: bookId,
       },
@@ -39,28 +38,17 @@ class BookService {
     if (!book) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Book not found");
     }
-    return await Book.destroy({
+    return await db.Book.destroy({
       where: {
         id: bookId,
       },
     });
   }
 
-  async rentBook(bookId: string, userId: string, rentBookDto: RentBookDto) {
-    const user: any = await userService.getUserById(userId);
-    const rentedBooks: any = await this.getBookByUserId(userId);
-    const bookNumber: number = rentedBooks.length;
-    if (bookNumber >= 3) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, "Don't rent >= 3 books");
-    }
-    const book: any = await this.getBookById(bookId);
-    await user.addBook(book, { through: rentBookDto });
-  }
-
   async getBookByUserId(userId: string) {
-    const user: any = await User.findOne({
+    const user: any = await db.User.findOne({
       where: { id: userId },
-      include: Book,
+      include: db.Book,
     });
 
     const books = user?.Books || [];
@@ -68,7 +56,7 @@ class BookService {
   }
 
   async getOutdatedBooks() {
-    const books: any = await Book.findAll({
+    const books: any = await db.Book.findAll({
       where: Sequelize.where(
         Sequelize.fn("date", Sequelize.col("outdated")),
         "<",

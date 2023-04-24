@@ -7,7 +7,7 @@ export default function (
   res: Response,
   next: NextFunction
 ) {
-  console.log("im here");
+  console.log(err);
   const status = err.status || 500;
   const message = err.message || "Something went wrong";
   res.status(status).send({

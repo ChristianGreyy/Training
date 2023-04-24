@@ -1,21 +1,23 @@
 import CreateUserDto from "../dtos/user/create-user.dto";
 import UpdateUserDto from "../dtos/user/update-user.dto";
-import User from "../models/user.model";
 import { StatusCodes } from "http-status-codes";
 import HttpException from "../configs/HttpException";
+import bookService from "./book.service";
+import RentBookDto from "../dtos/book/rent-book.dto";
+const db = require("../models/index.js");
 
 class UserService {
   async getUsers() {
-    return await User.findAll();
+    return await db.User.findAll();
   }
 
   async getUserById(userId: string) {
-    const user = await User.findByPk(userId);
+    const user = await db.User.findByPk(userId);
     return user;
   }
 
   async createUser(createUserDto: Partial<CreateUserDto>) {
-    return await User.create(createUserDto);
+    return await db.User.create(createUserDto);
   }
 
   async updateUserById(userId: string, updateUserDto: Partial<UpdateUserDto>) {
@@ -24,7 +26,7 @@ class UserService {
     if (!user) {
       throw new HttpException(StatusCodes.NOT_FOUND, "User not found");
     }
-    return await User.update(updateUserDto, {
+    return await db.User.update(updateUserDto, {
       where: {
         id: userId,
       },
@@ -36,11 +38,41 @@ class UserService {
     if (!user) {
       throw new HttpException(StatusCodes.NOT_FOUND, "User not found");
     }
-    return await User.destroy({
+    return await db.User.destroy({
       where: {
         id: userId,
       },
     });
+  }
+
+  async rentBook(bookId: string, userId: string, rentBookDto: RentBookDto) {
+    const user: any = await this.getUserById(userId);
+    const rentedBooks: any = await bookService.getBookByUserId(userId);
+    const bookNumber: number = rentedBooks.length;
+    if (bookNumber >= 3) {
+      throw new HttpException(StatusCodes.BAD_REQUEST, "Don't rent >= 3 books");
+    }
+    const book: any = await bookService.getBookById(bookId);
+    try {
+      const result = await db.sequelize.transaction(async (t: any) => {
+        await user.addBook(book, { through: rentBookDto }, { transaction: t });
+        await db.User.update(
+          { latest_rent_day: new Date() },
+          {
+            where: {
+              id: userId,
+            },
+          },
+          { transaction: t }
+        );
+      });
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "Transaction error"
+      );
+    }
   }
 }
 

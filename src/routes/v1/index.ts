@@ -1,7 +1,8 @@
 import express from "express";
 const router = express.Router();
-import userRouter from "./user.router";
-import bookRouter from "./book.router";
+import userRouter from "./user.route";
+import bookRouter from "./book.route";
+import authRouter from "./auth.route";
 
 const defaultRoutes = [
   {
@@ -11,6 +12,10 @@ const defaultRoutes = [
   {
     path: "/books",
     route: bookRouter,
+  },
+  {
+    path: "/auth",
+    route: authRouter,
   },
 ];
 

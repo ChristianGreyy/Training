@@ -14,6 +14,4 @@ router
   .put(bookController.updateBookById)
   .delete(bookController.deleteBookById);
 
-router.route("/:bookId/:userId").post(bookController.rentBook);
-
 export default router;
