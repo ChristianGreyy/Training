@@ -3,6 +3,8 @@ import HttpException from "../configs/HttpException";
 import { StatusCodes } from "http-status-codes";
 import catchAsync from "../utils/catchAsync";
 import { userService } from "../services";
+import authService from "../services/auth.service";
+import tokenService from "../services/token.service";
 
 const login = catchAsync(async (req: Request, res: Response) => {
   const token = await authService.login(req.body);
@@ -26,4 +28,4 @@ const resetToken = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export { login };
+export default { login, register, resetToken };

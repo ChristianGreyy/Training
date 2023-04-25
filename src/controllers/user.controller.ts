@@ -14,7 +14,7 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
   res.send(result);
 });
 
-const getUser = catchAsync(async (req: Request, res: Response) => {
+const getUserById = catchAsync(async (req: Request, res: Response) => {
   const user = await userService.getUserById(req.params.userId);
   if (!user) {
     throw new HttpException(StatusCodes.NOT_FOUND, "User not found");
@@ -22,14 +22,28 @@ const getUser = catchAsync(async (req: Request, res: Response) => {
   res.send(user);
 });
 
-const updateUser = catchAsync(async (req: Request, res: Response) => {
+const updateUserById = catchAsync(async (req: Request, res: Response) => {
   const user = await userService.updateUserById(req.params.userId, req.body);
   res.send(user);
 });
 
-const deleteUser = catchAsync(async (req: Request, res: Response) => {
+const deleteUserById = catchAsync(async (req: Request, res: Response) => {
   await userService.deleteUserById(req.params.userId);
   res.status(StatusCodes.NO_CONTENT).send();
 });
 
-export { createUser, getUsers, getUser, updateUser, deleteUser };
+const rentBook = catchAsync(async (req: Request, res: Response) => {
+  await userService.rentBook(req.params.bookId, req.params.userId, req.body);
+  return res.status(StatusCodes.CREATED).json({
+    message: "Rent book successfully",
+  });
+});
+
+export default {
+  createUser,
+  getUsers,
+  getUserById,
+  updateUserById,
+  deleteUserById,
+  rentBook,
+};

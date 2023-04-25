@@ -14,7 +14,7 @@ const userSchema = new Schema(
     },
     gender: {
       type: String,
-      require: true,
+      enum: ["male", "female"],
     },
     first_name: {
       type: String,
@@ -30,8 +30,18 @@ const userSchema = new Schema(
     },
     books: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Book",
+        book: {
+          type: Schema.Types.ObjectId,
+          ref: "Book",
+        },
+        start_time: {
+          type: Date,
+          require: true,
+        },
+        end_time: {
+          type: Date,
+          require: true,
+        },
       },
     ],
   },
@@ -39,14 +49,6 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
-
-// userSchema.pre("save", async function (next) {
-//   const user = this;
-//   if (user.isModified("password")) {
-//     user.pass_word = await bcrypt.hash(user.password, 8);
-//   }
-//   next();
-// });
 
 const User = mongoose.model("User", userSchema);
 
