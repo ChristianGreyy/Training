@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import HttpException from "../configs/HttpException";
 import authService from "../services/auth.service";
+import tokenService from "../services/token.service";
 
 class UserController {
   async login(req: Request, res: Response, next: NextFunction) {
@@ -21,6 +22,17 @@ class UserController {
       await authService.register(req.body);
       return res.status(StatusCodes.CREATED).json({
         message: "Register successfully",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async resetToken(req: Request, res: Response, next: NextFunction) {
+    try {
+      const token = await tokenService.refreshAuth(req.body.refreshToken);
+      return res.status(StatusCodes.CREATED).json({
+        token,
       });
     } catch (err) {
       next(err);

@@ -25,11 +25,16 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "User",
     }
   );
+
   User.associate = (models) => {
     models.User.belongsToMany(models.Book, {
       through: models.UserBook,
       foreignKey: "userId",
       otherKey: "bookId",
+    });
+
+    models.User.hasMany(models.Token, {
+      foreignKey: "userId",
     });
   };
 
@@ -39,4 +44,10 @@ module.exports = (sequelize, DataTypes) => {
 // UserBook.associate = (models) => {
 //   UserBook.belongsTo(models.User, { foreignKey: "userId" });
 //   UserBook.belongsTo(models.Book, { foreignKey: "bookId" });
+// };
+
+// Token.associate = (models) => {
+//   models.Token.belongsTo(models.User, {
+//     foreignKey: "userId",
+//   });
 // };

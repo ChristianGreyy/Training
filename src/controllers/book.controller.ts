@@ -5,7 +5,7 @@ import { bookService } from "../services";
 
 class BookController {
   private bookService = bookService;
-  async getBooks(req: Request, res: Response, next: NextFunction) {
+  async getBooks(req: any, res: Response, next: NextFunction) {
     try {
       const books = await bookService.getBooks();
       return res.status(StatusCodes.OK).json({
@@ -63,9 +63,9 @@ class BookController {
     }
   }
 
-  async getBookByUserId(req: Request, res: Response, next: NextFunction) {
+  async getBooksByUserId(req: Request, res: Response, next: NextFunction) {
     try {
-      const books = await bookService.getBookByUserId(req.params.userId);
+      const books = await bookService.getBooksByUserId(req.params.userId);
       return res.status(StatusCodes.OK).json({
         books,
       });
@@ -77,6 +77,17 @@ class BookController {
   async getOutdatedBooks(req: Request, res: Response, next: NextFunction) {
     try {
       const books = await bookService.getOutdatedBooks();
+      return res.status(StatusCodes.OK).json({
+        books,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getBooksByRenter(req: any, res: Response, next: NextFunction) {
+    try {
+      const books = await bookService.getBooksByUserId(req.userId);
       return res.status(StatusCodes.OK).json({
         books,
       });
