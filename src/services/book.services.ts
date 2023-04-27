@@ -4,13 +4,19 @@ import { Book, User } from "../models/index";
 import { IBook } from "../interfaces/book.interface";
 import CreateBookDto from "../dtos/book/create-book.dto";
 import UpdateBookrDto from "../dtos/book/update-book.dto";
+import { createNewBook } from "../queues/book-queue";
+import { createClient } from "redis";
+const client = createClient();
+client.on("error", (err) => console.log("Redis Client Error", err));
 
 class BookSerivce {
   async getBooks() {
+    // const books = await client.get()
     return await Book.find();
   }
 
   async createBook(bookBody: Partial<CreateBookDto>) {
+    createNewBook(bookBody);
     return Book.create(bookBody);
   }
 

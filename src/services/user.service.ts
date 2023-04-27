@@ -48,7 +48,6 @@ class UserSerivce {
     const session = await User.startSession();
     session.startTransaction();
     try {
-      const opts = { session };
       await User.updateOne(
         {
           _id: user._id,
@@ -62,18 +61,15 @@ class UserSerivce {
               end_time: rentBookDto.end_time,
             },
           },
-        },
-        opts
+        }
       );
-
       await Book.updateOne(
         {
           _id: book._id,
         },
         {
           $push: { users: user._id },
-        },
-        opts
+        }
       );
 
       await session.commitTransaction();
