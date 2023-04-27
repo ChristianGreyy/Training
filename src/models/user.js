@@ -13,12 +13,19 @@ module.exports = (sequelize, DataTypes) => {
   }
   User.init(
     {
+      role_id: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "Roles",
+          key: "id",
+        },
+      },
       user_name: DataTypes.STRING,
       pass_word: DataTypes.STRING,
       gender: DataTypes.ENUM("famale", "male"),
       first_name: DataTypes.STRING,
       last_name: DataTypes.STRING,
-      latest_rent_day: DataTypes.DATE,
+      birthday: DataTypes.DATE,
     },
     {
       sequelize,
@@ -27,27 +34,10 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   User.associate = (models) => {
-    models.User.belongsToMany(models.Book, {
-      through: models.UserBook,
-      foreignKey: "userId",
-      otherKey: "bookId",
-    });
-
     models.User.hasMany(models.Token, {
-      foreignKey: "userId",
+      foreignKey: "user_id",
     });
   };
 
   return User;
 };
-
-// UserBook.associate = (models) => {
-//   UserBook.belongsTo(models.User, { foreignKey: "userId" });
-//   UserBook.belongsTo(models.Book, { foreignKey: "bookId" });
-// };
-
-// Token.associate = (models) => {
-//   models.Token.belongsTo(models.User, {
-//     foreignKey: "userId",
-//   });
-// };

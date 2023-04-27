@@ -1,9 +1,8 @@
+import { StatusCodes } from "http-status-codes";
+import bcrypt from "bcrypt";
+import HttpException from "../configs/HttpException";
 import CreateUserDto from "../dtos/user/create-user.dto";
 import UpdateUserDto from "../dtos/user/update-user.dto";
-import { StatusCodes } from "http-status-codes";
-import HttpException from "../configs/HttpException";
-import bookService from "./book.service";
-import RentBookDto from "../dtos/book/rent-book.dto";
 import IUser from "../interfaces/user.interface";
 const db = require("../models/index.js");
 
@@ -17,7 +16,11 @@ class UserService {
     return user;
   }
 
-  async createUser(createUserDto: Partial<CreateUserDto>): Promise<IUser> {
+  async createUser(createUserDto: CreateUserDto): Promise<IUser> {
+    const password: string = createUserDto.pass_word;
+    const hashedPassword: string = await bcrypt.hash(password, 7);
+    createUserDto["pass_word"] = hashedPassword;
+
     return await db.User.create(createUserDto);
   }
 
@@ -47,36 +50,6 @@ class UserService {
         id: userId,
       },
     });
-  }
-
-  async rentBook(bookId: string, userId: string, rentBookDto: RentBookDto) {
-    const user: any = await this.getUserById(userId);
-    const rentedBooks: any = await bookService.getBooksByUserId(userId);
-    const bookNumber: number = rentedBooks.length;
-    if (bookNumber >= 3) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, "Don't rent >= 3 books");
-    }
-    const book: any = await bookService.getBookById(bookId);
-    try {
-      const result = await db.sequelize.transaction(async (t: any) => {
-        await user.addBook(book, { through: rentBookDto }, { transaction: t });
-        await db.User.update(
-          { latest_rent_day: new Date() },
-          {
-            where: {
-              id: userId,
-            },
-          },
-          { transaction: t }
-        );
-      });
-    } catch (err) {
-      console.log(err);
-      throw new HttpException(
-        StatusCodes.INTERNAL_SERVER_ERROR,
-        "Transaction error"
-      );
-    }
   }
 }
 

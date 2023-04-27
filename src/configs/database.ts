@@ -2,7 +2,7 @@ export default {
   HOST: "localhost",
   USER: "postgres",
   PASSWORD: "230502",
-  DB: "training",
+  DB: "middle-term",
   dialect: "postgres",
   pool: {
     max: 5,

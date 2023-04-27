@@ -12,5 +12,4 @@ router
   .put(userController.updateUserById)
   .delete(auth, userController.deleteUserById);
 
-router.route("/:userId/rent/:bookId").post(userController.rentBook);
 export default router;

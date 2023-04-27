@@ -19,7 +19,7 @@ class AuthService {
     return await tokenService.generateAuthTokens(user);
   }
 
-  async register(registerDto: Partial<RegisterDto>) {
+  async register(registerDto: RegisterDto) {
     const user: any = await db.User.findOne({
       where: { user_name: registerDto.user_name },
     });

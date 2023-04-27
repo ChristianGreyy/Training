@@ -1,4 +1,13 @@
 import userService from "./user.service";
-import bookService from "./book.service";
+import roleService from "./role.service";
+import typeService from "./type.service";
+import statusService from "./status.service";
+import priorityService from "./priority.service";
 
-export { userService, bookService };
+export {
+  userService,
+  roleService,
+  typeService,
+  statusService,
+  priorityService,
+};

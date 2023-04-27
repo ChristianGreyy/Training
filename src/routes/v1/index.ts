@@ -1,8 +1,11 @@
 import express from "express";
 const router = express.Router();
 import userRouter from "./user.route";
-import bookRouter from "./book.route";
+import roleRouter from "./role.route";
 import authRouter from "./auth.route";
+import statusRouter from "./status.route";
+import typeRouter from "./type.route";
+import priorityRouter from "./priority.route";
 
 const defaultRoutes = [
   {
@@ -10,9 +13,22 @@ const defaultRoutes = [
     route: userRouter,
   },
   {
-    path: "/books",
-    route: bookRouter,
+    path: "/statuses",
+    route: statusRouter,
   },
+  {
+    path: "/types",
+    route: typeRouter,
+  },
+  {
+    path: "/priorities",
+    route: priorityRouter,
+  },
+  {
+    path: "/roles",
+    route: roleRouter,
+  },
+
   {
     path: "/auth",
     route: authRouter,

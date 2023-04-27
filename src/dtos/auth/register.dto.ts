@@ -4,4 +4,6 @@ export default interface RegisterDto {
   gender: string;
   first_name: string;
   last_name: string;
+  birthday: string;
+  inactive: boolean;
 }
