@@ -1,5 +1,5 @@
 npx sequelize-cli model:generate --name Role --attributes name:string
-npx sequelize-cli model:generate --name User --attributes user_name:string,pass_word:string,gender:enum:'{famale,male}',first_name:string,last_name:string,birthday:date
+npx sequelize-cli model:generate --name User --attributes user_name:string,pass_word:string,gender:enum:'{female,male}',first_name:string,last_name:string,birthday:date
 npx sequelize-cli model:generate --name Type --attributes name:string,color:string
 npx sequelize-cli model:generate --name Status --attributes status:string,order:integer
 npx sequelize-cli model:generate --name Priority --attributes name:string,order:integer
@@ -12,7 +12,6 @@ npx sequelize-cli model:generate --name Task --attributes name:string,start_date
 npx sequelize-cli migration:create --name update-user
 
 #seed
-
 npx sequelize-cli seed:generate --name init-project
 
 npx sequelize-cli db:seed:all

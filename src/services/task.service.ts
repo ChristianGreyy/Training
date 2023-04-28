@@ -6,6 +6,7 @@ import userService from "./user.service";
 import { Op, Sequelize } from "sequelize";
 import ITask from "../interfaces/task.interface";
 import TaskQuery from "../dtos/task/task-query-dto";
+import validation from "../middlewares/validation";
 const db = require("../models/index.js");
 
 class TaskService {
@@ -18,14 +19,22 @@ class TaskService {
     return task;
   }
 
-  async createTask(createTaskDto: Partial<CreateTaskDto>): Promise<ITask> {
+  async createTask(createTaskDto: CreateTaskDto): Promise<ITask> {
+    const error = await validation(CreateTaskDto, createTaskDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     return await db.Task.create(createTaskDto);
   }
 
   async updateTaskById(
     taskId: string,
-    updateTaskDto: Partial<UpdateTaskDto>
+    updateTaskDto: UpdateTaskDto
   ): Promise<void> {
+    const error = await validation(UpdateTaskDto, updateTaskDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     const task = await this.getTaskById(taskId);
     if (!task) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Task not found");

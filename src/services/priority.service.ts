@@ -6,6 +6,7 @@ import userService from "./user.service";
 import { Op, Sequelize } from "sequelize";
 import IPriority from "../interfaces/priority.dto";
 import PriorityQuery from "../dtos/priority/priority-query.dto";
+import validation from "../middlewares/validation";
 const db = require("../models/index.js");
 
 class PriorityService {
@@ -25,15 +26,23 @@ class PriorityService {
   }
 
   async createPriority(
-    createPriorityDto: Partial<CreatePriorityDto>
+    createPriorityDto: CreatePriorityDto
   ): Promise<IPriority> {
+    const error = await validation(CreatePriorityDto, createPriorityDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     return await db.Priority.create(createPriorityDto);
   }
 
   async updatePriorityById(
     priorityId: string,
-    updatePriorityDto: Partial<UpdatePriorityDto>
+    updatePriorityDto: UpdatePriorityDto
   ): Promise<void> {
+    const error = await validation(UpdatePriorityDto, updatePriorityDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     const priority = await this.getPriorityById(priorityId);
     if (!priority) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Priority not found");

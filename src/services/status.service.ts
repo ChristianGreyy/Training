@@ -5,6 +5,7 @@ import HttpException from "../configs/HttpException";
 import { Op, Sequelize } from "sequelize";
 import IStatus from "../interfaces/status.interface";
 import StatusQuery from "../dtos/status/status-query.dto";
+import validation from "../middlewares/validation";
 const db = require("../models/index.js");
 
 class StatusService {
@@ -23,16 +24,22 @@ class StatusService {
     return status;
   }
 
-  async createStatus(
-    createStatusDto: Partial<CreateStatusDto>
-  ): Promise<IStatus> {
+  async createStatus(createStatusDto: CreateStatusDto): Promise<IStatus> {
+    const error = await validation(CreateStatusDto, createStatusDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     return await db.Status.create(createStatusDto);
   }
 
   async updateStatusById(
     statusId: string,
-    updateStatusDto: Partial<UpdateStatusDto>
+    updateStatusDto: UpdateStatusDto
   ): Promise<void> {
+    const error = await validation(UpdateStatusDto, updateStatusDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     const status = await this.getStatusById(statusId);
     if (!status) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Status not found");

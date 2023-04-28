@@ -6,6 +6,7 @@ import userService from "./user.service";
 import { Op, Sequelize } from "sequelize";
 import IProject from "../interfaces/project.interface";
 import ProjectQuery from "../dtos/project/project-query.dto";
+import validation from "../middlewares/validation";
 const db = require("../models/index.js");
 
 class ProjectService {
@@ -18,16 +19,22 @@ class ProjectService {
     return project;
   }
 
-  async createProject(
-    createProjectDto: Partial<CreateProjectDto>
-  ): Promise<IProject> {
+  async createProject(createProjectDto: CreateProjectDto): Promise<IProject> {
+    const error = await validation(CreateProjectDto, createProjectDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     return await db.Project.create(createProjectDto);
   }
 
   async updateProjectById(
     projectId: string,
-    updateProjectDto: Partial<UpdateProjectDto>
+    updateProjectDto: UpdateProjectDto
   ): Promise<void> {
+    const error = await validation(UpdateProjectDto, updateProjectDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     const project = await this.getProjectById(projectId);
     if (!project) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Project not found");

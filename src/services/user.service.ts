@@ -4,6 +4,7 @@ import HttpException from "../configs/HttpException";
 import CreateUserDto from "../dtos/user/create-user.dto";
 import UpdateUserDto from "../dtos/user/update-user.dto";
 import IUser from "../interfaces/user.interface";
+import validation from "../middlewares/validation";
 const db = require("../models/index.js");
 
 class UserService {
@@ -17,6 +18,10 @@ class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<IUser> {
+    const error = await validation(CreateUserDto, createUserDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     const password: string = createUserDto.pass_word;
     const hashedPassword: string = await bcrypt.hash(password, 7);
     createUserDto["pass_word"] = hashedPassword;
@@ -26,10 +31,13 @@ class UserService {
 
   async updateUserById(
     userId: string,
-    updateUserDto: Partial<UpdateUserDto>
+    updateUserDto: UpdateUserDto
   ): Promise<IUser> {
+    const error = await validation(UpdateUserDto, updateUserDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     const user = await this.getUserById(userId);
-    console.log(user);
     if (!user) {
       throw new HttpException(StatusCodes.NOT_FOUND, "User not found");
     }

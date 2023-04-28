@@ -6,6 +6,7 @@ import userService from "./user.service";
 import { Op, Sequelize } from "sequelize";
 import IType from "../interfaces/type.interface";
 import TypeQuery from "../dtos/type/type-query.dto";
+import validation from "../middlewares/validation";
 const db = require("../models/index.js");
 
 class TypeService {
@@ -24,14 +25,22 @@ class TypeService {
     return type;
   }
 
-  async createType(createTypeDto: Partial<CreateTypeDto>): Promise<IType> {
+  async createType(createTypeDto: CreateTypeDto): Promise<IType> {
+    const error = await validation(CreateTypeDto, createTypeDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     return await db.Type.create(createTypeDto);
   }
 
   async updateTypeById(
     typeId: string,
-    updateTypeDto: Partial<UpdateTypeDto>
+    updateTypeDto: UpdateTypeDto
   ): Promise<void> {
+    const error = await validation(UpdateTypeDto, updateTypeDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
     const type = await this.getTypeById(typeId);
     if (!type) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Type not found");

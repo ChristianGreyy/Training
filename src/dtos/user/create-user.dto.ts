@@ -1,23 +1,27 @@
 import {
   IsDate,
   IsEnum,
+  IsInt,
   IsString,
   Matches,
   MaxLength,
   MinLength,
 } from "class-validator";
 
-enum gender {
+enum Gender {
   male = "male",
   female = "female",
 }
 
-enum StatusEnum {
+enum Status {
   active = "active",
   inactive = "inactive",
 }
 
 export default class CreateUserDto {
+  @IsInt()
+  role_id!: string;
+
   @IsString()
   @MinLength(4)
   @MaxLength(50)
@@ -32,22 +36,21 @@ export default class CreateUserDto {
   pass_word!: string;
 
   @IsString()
-  @MinLength(4)
+  @MinLength(2)
   @MaxLength(20)
   first_name!: string;
 
   @IsString()
-  @MinLength(4)
+  @MinLength(2)
   @MaxLength(20)
   last_name!: string;
 
-  @IsDate()
+  @IsString()
   birthday!: string;
 
-  @IsString()
-  @MaxLength(4)
+  @IsEnum(Gender, { message: "Invalid gender of user" })
   gender!: string;
 
-  @IsEnum(status, { message: "Invalid user role" })
-  inactive: boolean;
+  // @IsEnum(Status, { message: "Invalid status of user" })
+  // status!: boolean;
 }

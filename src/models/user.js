@@ -22,10 +22,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       user_name: DataTypes.STRING,
       pass_word: DataTypes.STRING,
-      gender: DataTypes.ENUM("famale", "male"),
+      gender: DataTypes.ENUM("female", "male"),
       first_name: DataTypes.STRING,
       last_name: DataTypes.STRING,
       birthday: DataTypes.DATE,
+      status: {
+        type: DataTypes.ENUM("active", "inactive"),
+        defaultValue: "active",
+      },
     },
     {
       sequelize,

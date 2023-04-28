@@ -23,7 +23,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       gender: {
-        type: Sequelize.ENUM("famale", "male"),
+        type: Sequelize.ENUM("female", "male"),
       },
       first_name: {
         type: Sequelize.STRING,
