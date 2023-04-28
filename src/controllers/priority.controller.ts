@@ -5,9 +5,9 @@ import { priorityService } from "../services";
 
 class PriorityController {
   private priorityService = priorityService;
-  async getPriorities(req: Request, res: Response, next: NextFunction) {
+  async getPriorities(req: any, res: Response, next: NextFunction) {
     try {
-      const prioritys = await priorityService.getPriorities();
+      const prioritys = await priorityService.getPriorities(req.query);
       return res.status(StatusCodes.OK).json({
         prioritys,
       });
@@ -59,6 +59,17 @@ class PriorityController {
       await priorityService.deletePriorityById(req.params.priorityId);
       return res.status(StatusCodes.NO_CONTENT).json({
         message: "Delete priority successfully",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async restorePriorityById(req: Request, res: Response, next: NextFunction) {
+    try {
+      await priorityService.restorePriorityById(req.params.priorityId);
+      return res.status(StatusCodes.NO_CONTENT).json({
+        message: "Restore priority successfully",
       });
     } catch (err) {
       next(err);

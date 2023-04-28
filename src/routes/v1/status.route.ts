@@ -9,6 +9,8 @@ router
   .get(statusController.getStatuses)
   .post(statusController.createStatus);
 
+router.put("/restore/:statusId", statusController.restoreStatusById);
+
 router
   .route("/:statusId")
   .get(statusController.getStatusById)

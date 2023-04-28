@@ -3,6 +3,8 @@ import roleService from "./role.service";
 import typeService from "./type.service";
 import statusService from "./status.service";
 import priorityService from "./priority.service";
+import projectService from "./project.service";
+import taskService from "./task.service";
 
 export {
   userService,
@@ -10,4 +12,6 @@ export {
   typeService,
   statusService,
   priorityService,
+  projectService,
+  taskService,
 };

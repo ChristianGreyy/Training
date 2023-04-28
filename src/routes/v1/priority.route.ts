@@ -9,6 +9,8 @@ router
   .get(priorityController.getPriorities)
   .post(priorityController.createPriority);
 
+router.put("/restore/:priorityId", priorityController.restorePriorityById);
+
 router
   .route("/:priorityId")
   .get(priorityController.getPriorityById)

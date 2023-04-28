@@ -4,15 +4,17 @@ import { StatusCodes } from "http-status-codes";
 import HttpException from "../configs/HttpException";
 import { Op, Sequelize } from "sequelize";
 import IStatus from "../interfaces/status.interface";
+import StatusQuery from "../dtos/status/status-query.dto";
 const db = require("../models/index.js");
 
 class StatusService {
-  async getStatuses(): Promise<IStatus[]> {
-    return await db.Status.findAll({
-      where: { deletedAt: { [Op.not]: null } },
-      paranoid: false,
-    });
-
+  async getStatuses(statusQuery: StatusQuery): Promise<IStatus[]> {
+    if (statusQuery.deleteFlag == "true") {
+      return await db.Status.findAll({
+        where: { deletedAt: { [Op.not]: null } },
+        paranoid: false,
+      });
+    }
     return await db.Status.findAll();
   }
 
@@ -52,6 +54,17 @@ class StatusService {
         id: statusId,
       },
     });
+  }
+
+  async restoreStatusById(statusId: string): Promise<void> {
+    const status = await db.Status.findOne({
+      where: { id: statusId, deletedAt: { [Op.not]: null } },
+      paranoid: false,
+    });
+    if (!status) {
+      throw new HttpException(StatusCodes.NOT_FOUND, "Status not found");
+    }
+    return await db.Status.restore();
   }
 }
 

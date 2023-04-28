@@ -5,9 +5,9 @@ import { typeService } from "../services";
 
 class TypeController {
   private typeService = typeService;
-  async getTypes(req: Request, res: Response, next: NextFunction) {
+  async getTypes(req: any, res: Response, next: NextFunction) {
     try {
-      const types = await typeService.getTypes();
+      const types = await typeService.getTypes(req.query);
       return res.status(StatusCodes.OK).json({
         types,
       });

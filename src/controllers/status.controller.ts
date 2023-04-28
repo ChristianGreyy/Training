@@ -5,9 +5,9 @@ import { statusService } from "../services";
 
 class StatusController {
   private statusService = statusService;
-  async getStatuses(req: Request, res: Response, next: NextFunction) {
+  async getStatuses(req: any, res: Response, next: NextFunction) {
     try {
-      const statuses = await statusService.getStatuses();
+      const statuses = await statusService.getStatuses(req.query);
       return res.status(StatusCodes.OK).json({
         statuses,
       });
@@ -57,6 +57,17 @@ class StatusController {
       await statusService.deleteStatusById(req.params.statusId);
       return res.status(StatusCodes.NO_CONTENT).json({
         message: "Delete status successfully",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async restoreStatusById(req: Request, res: Response, next: NextFunction) {
+    try {
+      await statusService.restoreStatusById(req.params.statusId);
+      return res.status(StatusCodes.NO_CONTENT).json({
+        message: "Restore status successfully",
       });
     } catch (err) {
       next(err);

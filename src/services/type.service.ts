@@ -5,15 +5,17 @@ import HttpException from "../configs/HttpException";
 import userService from "./user.service";
 import { Op, Sequelize } from "sequelize";
 import IType from "../interfaces/type.interface";
+import TypeQuery from "../dtos/type/type-query.dto";
 const db = require("../models/index.js");
 
 class TypeService {
-  async getTypes(): Promise<IType[]> {
-    return await db.Type.findOne({
-      where: { deletedAt: { [Op.not]: null } },
-      paranoid: false,
-    });
-
+  async getTypes(typeQuery: TypeQuery): Promise<IType[]> {
+    if (typeQuery.deleteFlag == "true") {
+      return await db.Type.findAll({
+        where: { deletedAt: { [Op.not]: null } },
+        paranoid: false,
+      });
+    }
     return await db.Type.findAll();
   }
 
