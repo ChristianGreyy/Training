@@ -38,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   User.associate = (models) => {
+    models.User.belongsTo(models.Role, {
+      foreignKey: "role_id",
+    });
+
     models.User.hasMany(models.Task, {
       foreignKey: "creator_id",
     });
@@ -53,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
     models.User.belongsToMany(models.Project, {
       through: models.User_Projects,
       foreignKey: "user_id",
-      otherKey: "projectd_id",
+      otherKey: "project_id",
     });
   };
 

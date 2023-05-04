@@ -5,13 +5,13 @@ import HttpException from "../configs/HttpException";
 import userService from "./user.service";
 import { Op, Sequelize } from "sequelize";
 import IPriority from "../interfaces/priority.dto";
-import PriorityQuery from "../dtos/priority/priority-query.dto";
 import validation from "../middlewares/validation";
+import QueryDto from "../dtos/query.dto";
 const db = require("../models/index.js");
 
 class PriorityService {
-  async getPriorities(priorityQuery: PriorityQuery): Promise<IPriority[]> {
-    if (priorityQuery.deleteFlag == "true") {
+  async getPriorities(queryDto: QueryDto): Promise<IPriority[]> {
+    if (queryDto.deleteFlag == "true") {
       return await db.Priority.findAll({
         where: { deletedAt: { [Op.not]: null } },
         paranoid: false,

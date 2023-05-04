@@ -7,10 +7,8 @@ class UserController {
   private userService = userService;
   async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
-      const users = await userService.getUsers();
-      return res.status(StatusCodes.OK).json({
-        users,
-      });
+      const results = await userService.getUsers(req.query);
+      return res.status(StatusCodes.OK).send(results);
     } catch (err) {
       next(err);
     }

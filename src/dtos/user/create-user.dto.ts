@@ -20,7 +20,7 @@ enum Status {
 
 export default class CreateUserDto {
   @IsInt()
-  role_id!: string;
+  role_id!: number;
 
   @IsString()
   @MinLength(4)

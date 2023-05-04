@@ -40,7 +40,7 @@ class AuthService {
 
   async generateAuthTokens(user: any) {
     const secret: string = process.env.SUPER_SECRET || "";
-    const accessTokenExpires = moment().add(30, "minutes");
+    const accessTokenExpires = moment().add(7, "days");
     const accessToken = await this.generateToken(
       user.id,
       accessTokenExpires,
@@ -48,7 +48,7 @@ class AuthService {
       secret
     );
 
-    const refreshTokenExpires = moment().add(1, "days");
+    const refreshTokenExpires = moment().add(30, "days");
     const refreshToken = await this.generateToken(
       user.id,
       refreshTokenExpires,
@@ -66,6 +66,23 @@ class AuthService {
       refresh: {
         token: refreshToken,
         expires: refreshTokenExpires.toDate(),
+      },
+    };
+  }
+
+  async generateAcessTokens(user: any) {
+    const secret: string = process.env.SUPER_SECRET || "";
+    const accessTokenExpires = moment().add(30, "minutes");
+    const accessToken = await this.generateToken(
+      user.id,
+      accessTokenExpires,
+      "access",
+      secret
+    );
+    return {
+      access: {
+        token: accessToken,
+        expires: accessTokenExpires.toDate(),
       },
     };
   }
@@ -90,26 +107,20 @@ class AuthService {
     return tokenDoc;
   }
 
-  async refreshAuth(refreshToken: string) {
+  async refreshAccessToken(refreshToken: string) {
     try {
       const refreshTokenDoc = await this.verifyToken(refreshToken, "refresh");
-      console.log(refreshToken);
       const user = await userService.getUserById(refreshTokenDoc.userId);
-      console.log(user);
       if (!user) {
         throw new HttpException(StatusCodes.UNAUTHORIZED, "Unauthorized");
       }
-      try {
-        await db.Token.destroy({
-          where: {
-            id: refreshTokenDoc.id,
-          },
-        });
-      } catch (err: any) {
-        throw new HttpException(StatusCodes.INTERNAL_SERVER_ERROR, err.message);
-      }
+      await db.Token.destroy({
+        where: {
+          id: refreshTokenDoc.id,
+        },
+      });
 
-      return this.generateAuthTokens(user);
+      return this.generateAcessTokens(user);
     } catch (error: any) {
       throw new HttpException(StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }

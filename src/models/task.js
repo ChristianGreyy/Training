@@ -64,5 +64,32 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Task",
     }
   );
+
+  Task.associate = (models) => {
+    models.Task.belongsTo(models.User, {
+      foreignKey: "creator_id",
+    });
+
+    models.Task.belongsTo(models.User, {
+      foreignKey: "assignee_id",
+    });
+
+    models.Task.belongsTo(models.Type, {
+      foreignKey: "type_id",
+    });
+
+    models.Task.belongsTo(models.Status, {
+      foreignKey: "status_id",
+    });
+
+    models.Task.belongsTo(models.Priority, {
+      foreignKey: "priority_id",
+    });
+
+    models.Task.belongsTo(models.Project, {
+      foreignKey: "project_id",
+    });
+  };
+
   return Task;
 };

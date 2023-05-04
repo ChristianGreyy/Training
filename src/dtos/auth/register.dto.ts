@@ -2,6 +2,7 @@ import {
   IsDate,
   IsEnum,
   IsInt,
+  IsOptional,
   IsString,
   Matches,
   MaxLength,
@@ -19,8 +20,14 @@ enum Status {
 }
 
 export default class RegisterDto {
+  @IsString()
+  @MinLength(4)
+  @MaxLength(100)
+  code!: string;
+
+  @IsOptional()
   @IsInt()
-  role_id!: string;
+  role_id!: number;
 
   @IsString()
   @MinLength(4)

@@ -4,13 +4,13 @@ import { StatusCodes } from "http-status-codes";
 import HttpException from "../configs/HttpException";
 import { Op, Sequelize } from "sequelize";
 import IStatus from "../interfaces/status.interface";
-import StatusQuery from "../dtos/status/status-query.dto";
 import validation from "../middlewares/validation";
+import QueryDto from "../dtos/query.dto";
 const db = require("../models/index.js");
 
 class StatusService {
-  async getStatuses(statusQuery: StatusQuery): Promise<IStatus[]> {
-    if (statusQuery.deleteFlag == "true") {
+  async getStatuses(queryDto: QueryDto): Promise<IStatus[]> {
+    if (queryDto.deleteFlag == "true") {
       return await db.Status.findAll({
         where: { deletedAt: { [Op.not]: null } },
         paranoid: false,

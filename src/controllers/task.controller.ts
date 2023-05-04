@@ -5,12 +5,20 @@ import { taskService } from "../services";
 
 class TaskController {
   private taskService = taskService;
+
+  async getPersonalTasks(req: any, res: Response, next: NextFunction) {
+    try {
+      const results = await taskService.getPersonalTasks(req.query);
+      return res.status(StatusCodes.OK).send(results);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async getTasks(req: any, res: Response, next: NextFunction) {
     try {
-      const tasks = await taskService.getTasks(req.query);
-      return res.status(StatusCodes.OK).json({
-        tasks,
-      });
+      const results = await taskService.getTasks(req.query);
+      return res.status(StatusCodes.OK).send(results);
     } catch (err) {
       next(err);
     }

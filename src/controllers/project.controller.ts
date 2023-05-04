@@ -2,21 +2,31 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import HttpException from "../configs/HttpException";
 import { projectService } from "../services";
+import pick from "../utils/pick";
 
 class ProjectController {
   private projectService = projectService;
-  async getProjects(req: any, res: Response, next: NextFunction) {
+
+  async getPersonalProjects(req: any, res: Response, next: NextFunction) {
+    // req.query =
     try {
-      const projects = await projectService.getProjects(req.query);
-      return res.status(StatusCodes.OK).json({
-        projects,
-      });
+      const results = await projectService.getPersonalProjects(req.user.id);
+      return res.status(StatusCodes.OK).send(results);
     } catch (err) {
       next(err);
     }
   }
 
-  async getProjectById(req: Request, res: Response, next: NextFunction) {
+  async getProjects(req: any, res: Response, next: NextFunction) {
+    try {
+      const results = await projectService.getProjects(req.query);
+      return res.status(StatusCodes.OK).send(results);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getProjectById(req: any, res: Response, next: NextFunction) {
     try {
       const project = await projectService.getProjectById(req.params.projectId);
       if (!project) {
@@ -68,6 +78,20 @@ class ProjectController {
       await projectService.restoreProjectById(req.params.projectId);
       return res.status(StatusCodes.NO_CONTENT).json({
         message: "Restore project successfully",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async solveMembersToProject(req: any, res: Response, next: NextFunction) {
+    try {
+      await projectService.solveMembersToProject(
+        req.params.projectId,
+        req.body
+      );
+      return res.status(StatusCodes.OK).json({
+        message: "Update members of project successfully",
       });
     } catch (err) {
       next(err);

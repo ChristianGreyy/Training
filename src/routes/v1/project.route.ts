@@ -4,15 +4,19 @@ import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
+router.get("/personal", auth(["user"]), projectController.getPersonalProjects);
+
 router
   .route("/")
-  .get(projectController.getProjects)
-  .post(projectController.createProject);
+  .get(auth(["admin"]), projectController.getProjects)
+  .post(auth(["admin"]), projectController.createProject);
+
+router.patch("/:projectId/members", projectController.solveMembersToProject);
 
 router
   .route("/:projectId")
-  .get(projectController.getProjectById)
-  .put(projectController.updateProjectById)
-  .delete(auth, projectController.deleteProjectById);
+  .get(auth(["admin"]), projectController.getProjectById)
+  .put(auth(["admin"]), projectController.updateProjectById)
+  .delete(auth(["admin"]), projectController.deleteProjectById);
 
 export default router;

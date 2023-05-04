@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Status.init(
     {
-      status: DataTypes.STRING,
+      name: DataTypes.STRING,
       order: DataTypes.INTEGER,
     },
     {
@@ -22,5 +22,12 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true, // enable soft deletion
     }
   );
+
+  Status.associate = (models) => {
+    models.Status.hasMany(models.Task, {
+      foreignKey: "status_id",
+    });
+  };
+
   return Status;
 };

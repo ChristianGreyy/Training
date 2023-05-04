@@ -5,11 +5,17 @@ import CreateUserDto from "../dtos/user/create-user.dto";
 import UpdateUserDto from "../dtos/user/update-user.dto";
 import IUser from "../interfaces/user.interface";
 import validation from "../middlewares/validation";
+import paginatePlugin from "../models/plugins/paginate.plugin";
+import pick from "../utils/pick";
+import QueryDto from "../dtos/query.dto";
 const db = require("../models/index.js");
 
 class UserService {
-  async getUsers(): Promise<IUser[]> {
-    return await db.User.findAll();
+  async getUsers(queryDto: QueryDto): Promise<any> {
+    const filter = pick(queryDto, ["id", "user_name", "gender", "status"]);
+    const options = pick(queryDto, ["sortBy", "limit", "page", "populate"]);
+    const userQuery = await paginatePlugin(db.User, filter, options);
+    return userQuery;
   }
 
   async getUserById(userId: string): Promise<IUser> {
@@ -17,7 +23,7 @@ class UserService {
     return user;
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<IUser> {
+  async createUser(createUserDto: CreateUserDto): Promise<any> {
     const error = await validation(CreateUserDto, createUserDto);
     if (error) {
       throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);

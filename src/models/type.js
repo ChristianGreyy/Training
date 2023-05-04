@@ -22,5 +22,12 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true, // enable soft deletion
     }
   );
+
+  Type.associate = (models) => {
+    models.Type.hasMany(models.Task, {
+      foreignKey: "type_id",
+    });
+  };
+
   return Type;
 };

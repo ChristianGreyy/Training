@@ -22,7 +22,7 @@ enum Status {
 export default class UpdateUserDto {
   @IsOptional()
   @IsInt()
-  role_id!: string;
+  role_id!: number;
 
   @IsOptional()
   @IsString()

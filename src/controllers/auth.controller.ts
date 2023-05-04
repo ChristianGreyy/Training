@@ -30,12 +30,29 @@ class UserController {
 
   async resetToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const token = await tokenService.refreshAuth(req.body.refreshToken);
+      const token = await tokenService.refreshAccessToken(
+        req.body.refreshToken
+      );
       return res.status(StatusCodes.CREATED).json({
         token,
       });
     } catch (err) {
       next(err);
+    }
+  }
+
+  async createInvite(req: any, res: Response, next: NextFunction) {
+    try {
+      const code = await authService.createInvite({
+        project_id: req.body.project_id,
+        user_id: req.user.id,
+        role: req.body.role,
+      });
+      return res.status(StatusCodes.CREATED).json({
+        code,
+      });
+    } catch (err) {
+      return next(err);
     }
   }
 }

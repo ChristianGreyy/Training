@@ -22,5 +22,12 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true, // enable soft deletion
     }
   );
+
+  Priority.associate = (models) => {
+    models.Priority.hasMany(models.Task, {
+      foreignKey: "priority_id",
+    });
+  };
+
   return Priority;
 };

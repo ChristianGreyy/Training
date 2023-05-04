@@ -6,8 +6,18 @@ import authRouter from "./auth.route";
 import statusRouter from "./status.route";
 import typeRouter from "./type.route";
 import priorityRouter from "./priority.route";
+import projectRouter from "./project.route";
+import taskRouter from "./task.route";
 
 const defaultRoutes = [
+  {
+    path: "/tasks",
+    route: taskRouter,
+  },
+  {
+    path: "/projects",
+    route: projectRouter,
+  },
   {
     path: "/users",
     route: userRouter,
