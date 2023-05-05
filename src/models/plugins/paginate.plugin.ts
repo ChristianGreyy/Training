@@ -21,30 +21,65 @@ export default async function (Model: any, filter: any, options: any) {
 
   const countPromise = Model.count({ where: filter });
 
+  // example: {{url}}/api/v1/tasks?populate=User*creator,User*assignee,Project.Task
+  //     "results": [
+  //         {
+  //             "id": 3,
+  //             "creator": {
+  //                 "id": 11,
+  //             },
+  //             "assignee": {
+  //                 "id": 8,
+  //             },
+  //             "Project": {
+  //                 "id": 1,
+  //                 "Tasks": [
+  //                     {
+  //                         "id": 2,
+  //                     },
+  //                     {
+  //                         "id": 3,
+  //                     }
+  //                 ]
+  //             }
+  //         }
+  //     ],
   let populate: any[] = [];
   if (options.populate) {
     options.populate.split(",").forEach((populateOption: any) => {
-      let length = populateOption.split(".").length;
       let item = populateOption
         .split(".")
-        .reduce((acc: any, modelfk: any, index: number) => {
-          console.log(modelfk);
-          const model = modelfk.split("*")[0];
-          const fk = modelfk.split("*")[1];
+        .reduce((acc: any, modelalias: any, index: number) => {
+          const model = modelalias.split("*")[0];
+          const alias = modelalias.split("*")[1];
 
           if (index >= 1) {
-            acc["include"] = {
-              model: db[model],
-              foreignKey: fk ? fk : "",
-              include: [],
-            };
+            if (alias) {
+              acc["include"] = {
+                model: db[model],
+                as: alias,
+                include: [],
+              };
+            } else {
+              acc["include"] = {
+                model: db[model],
+                include: [],
+              };
+            }
             return acc;
           } else {
-            return {
-              model: db[model],
-              foreignKey: fk ? fk : "",
-              include: [],
-            };
+            if (alias) {
+              return {
+                model: db[model],
+                as: alias,
+                include: [],
+              };
+            } else {
+              return {
+                model: db[model],
+                include: [],
+              };
+            }
           }
         }, {});
       populate.push(item);

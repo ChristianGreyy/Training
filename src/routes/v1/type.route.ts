@@ -4,14 +4,17 @@ import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
-router.route("/").get(typeController.getTypes).post(typeController.createType);
+router
+  .route("/")
+  .get(auth(["user", "admin"]), typeController.getTypes)
+  .post(auth(["admin"]), typeController.createType);
 
-router.put("/restore/:typeId", typeController.restoreTypeById);
+router.put("/restore/:typeId", auth(["admin"]), typeController.restoreTypeById);
 
 router
   .route("/:typeId")
-  .get(typeController.getTypeById)
-  .put(typeController.updateTypeById)
-  .delete(typeController.deleteTypeById);
+  .get(auth(["admin"]), typeController.getTypeById)
+  .put(auth(["admin"]), typeController.updateTypeById)
+  .delete(auth(["admin"]), typeController.deleteTypeById);
 
 export default router;

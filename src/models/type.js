@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
   Type.associate = (models) => {
     models.Type.hasMany(models.Task, {
       foreignKey: "type_id",
+      as: "type",
     });
   };
 

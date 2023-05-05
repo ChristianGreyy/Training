@@ -1,4 +1,5 @@
 import { Op, Sequelize } from "sequelize";
+import { createClient } from "redis";
 import slugify from "slugify";
 import CreateProjectDto from "../dtos/project/create-project.dto";
 import UpdateProjectDto from "../dtos/project/update-project.dto";
@@ -11,20 +12,62 @@ import QueryDto from "../dtos/query.dto";
 import paginatePlugin from "../models/plugins/paginate.plugin";
 import pick from "../utils/pick";
 import SolveMemberProjectDto from "../dtos/project/solve-member-project.dto";
+import client from "../configs/redis";
 const db = require("../models/index.js");
 
 class ProjectService {
   async getPersonalProjects(user_id: number): Promise<IProject> {
-    const projects = await db.Project.findAll({
+    const personalProjects = await db.Project.findAll({
       include: [
         {
           model: db.User,
-          where: { id: user_id },
+          as: "members",
+          where: {
+            id: user_id,
+          },
+        },
+      ],
+    });
+
+    const personalProjectsId = personalProjects.map(
+      (personalProject: any) => personalProject.dataValues.id
+    );
+
+    const projects = await db.Project.findAll({
+      where: {
+        id: personalProjectsId,
+      },
+      include: [
+        {
+          model: db.User,
+          as: "members",
+        },
+        {
+          model: db.Task,
+          as: "tasks",
           include: [
             {
-              model: db.Task,
+              model: db.User,
+              as: "creator",
+              where: {
+                id: user_id,
+              },
+            },
+            {
+              model: db.Type,
+              as: "type",
+            },
+            {
+              model: db.Status,
+              as: "status",
+            },
+            {
+              model: db.Priority,
+              as: "priority",
+              order: [["order", "DESC"]],
             },
           ],
+          order: [[{ model: db.Priority }, "order", "DESC"]],
         },
       ],
     });
@@ -37,9 +80,9 @@ class ProjectService {
     const projectQuery = await paginatePlugin(db.Project, filter, options);
 
     projectQuery.results = projectQuery.results.map((project: any) => {
-      project.dataValues["task_total"] = project.Tasks.length;
-      project.dataValues["completed_tasks"] = project.Tasks.filter(
-        (task: any) => task.Status.name == "Resolved"
+      project.dataValues["task_total"] = project.tasks.length;
+      project.dataValues["completed_tasks"] = project.tasks.filter(
+        (task: any) => task.status.name == "Resolved"
       ).length;
       return project;
     });
@@ -47,7 +90,26 @@ class ProjectService {
   }
 
   async getProjectById(projectId: string): Promise<any> {
-    const project = await db.Project.findByPk(projectId);
+    let project;
+    await client.connect();
+    const cachedProject = await client.hGetAll(`mt:users:${projectId}`);
+
+    if (Object.keys(cachedProject).length === 0) {
+      project = await db.Project.findByPk(projectId);
+
+      for (let key in project.dataValues) {
+        if (project.dataValues[key] instanceof Date) {
+          project.dataValues[key] = project.dataValues[key].toISOString();
+        } else {
+          project.dataValues[key] = project.dataValues[key].toString();
+        }
+      }
+      await client.HSET(`mt:users:${projectId}`, project.dataValues);
+    } else {
+      console.log(cachedProject);
+      project = cachedProject;
+    }
+    await client.disconnect();
     return project;
   }
 
@@ -57,6 +119,15 @@ class ProjectService {
       throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
     }
     createProjectDto["slug"] = slugify(createProjectDto["name"], "_");
+    if (
+      new Date(createProjectDto.start_date) >
+      new Date(createProjectDto.end_date)
+    ) {
+      throw new HttpException(
+        StatusCodes.NOT_FOUND,
+        "Invalid start_date or end_date"
+      );
+    }
     return await db.Project.create(createProjectDto);
   }
 
@@ -123,14 +194,23 @@ class ProjectService {
     const usersId = solveMembersToProject.members.map(
       (member: any) => member.user_id
     );
+    console.log(usersId);
     const users = await db.User.findAll({
       where: { id: usersId },
     });
 
     if (status == "add") {
-      return await project.addUsers(users);
+      const userProjects = solveMembersToProject.members.map((member: any) => {
+        return {
+          user_id: member.user_id,
+          project_id: project.id,
+          role: member.role,
+        };
+      });
+      return await db.User_Projects.bulkCreate(userProjects);
+      // return await project.addMembers(users);
     } else if (status == "delete") {
-      return await project.removeUsers(users);
+      return await project.removeMembers(users);
     }
   }
 }

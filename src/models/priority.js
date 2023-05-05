@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
   Priority.associate = (models) => {
     models.Priority.hasMany(models.Task, {
       foreignKey: "priority_id",
+      as: "priority",
     });
   };
 

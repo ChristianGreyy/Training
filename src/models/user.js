@@ -44,10 +44,12 @@ module.exports = (sequelize, DataTypes) => {
 
     models.User.hasMany(models.Task, {
       foreignKey: "creator_id",
+      // as: "tasks",
     });
 
     models.User.hasMany(models.Task, {
       foreignKey: "assignee_id",
+      // as: "tasks",
     });
 
     models.User.hasMany(models.Token, {
@@ -57,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
     models.User.belongsToMany(models.Project, {
       through: models.User_Projects,
       foreignKey: "user_id",
+      as: "projects",
       otherKey: "project_id",
     });
   };

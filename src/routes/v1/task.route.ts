@@ -9,12 +9,12 @@ router.get("/personal", auth(["user"]), taskController.getPersonalTasks);
 router
   .route("/")
   .get(auth(["admin", "user"]), taskController.getTasks)
-  .post(taskController.createTask);
+  .post(auth(["admin", "user"]), taskController.createTask);
 
 router
   .route("/:taskId")
   .get(auth(["admin"]), taskController.getTaskById)
-  .put(auth(["admin"]), taskController.updateTaskById)
+  .put(auth(["user", "admin"]), taskController.updateTaskById)
   .delete(auth(["admin"]), taskController.deleteTaskById);
 
 export default router;

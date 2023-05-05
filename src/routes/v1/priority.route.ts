@@ -6,15 +6,19 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(priorityController.getPriorities)
-  .post(priorityController.createPriority);
+  .get(auth(["admin", "user"]), priorityController.getPriorities)
+  .post(auth(["admin"]), priorityController.createPriority);
 
-router.put("/restore/:priorityId", priorityController.restorePriorityById);
+router.put(
+  "/restore/:priorityId",
+  auth(["admin"]),
+  priorityController.restorePriorityById
+);
 
 router
   .route("/:priorityId")
-  .get(priorityController.getPriorityById)
-  .put(priorityController.updatePriorityById)
-  .delete(priorityController.deletePriorityById);
+  .get(auth(["admin"]), priorityController.getPriorityById)
+  .put(auth(["admin"]), priorityController.updatePriorityById)
+  .delete(auth(["admin"]), priorityController.deletePriorityById);
 
 export default router;

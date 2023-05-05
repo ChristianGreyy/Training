@@ -13,11 +13,42 @@ import paginatePlugin from "../models/plugins/paginate.plugin";
 const db = require("../models/index.js");
 
 class TaskService {
-  async getPersonalTasks(queryDto: QueryDto): Promise<any> {
-    const filter = pick(queryDto, ["id", "name"]);
-    const options = pick(queryDto, ["sortBy", "limit", "page", "populate"]);
-    const taskQuery = await paginatePlugin(db.Task, filter, options);
-    return taskQuery;
+  async getPersonalTasks(user_id: number): Promise<any> {
+    const tasks = await db.Task.findAll({
+      include: [
+        {
+          model: db.User,
+          as: "creator",
+          where: {
+            id: user_id,
+          },
+        },
+        {
+          model: db.User,
+          as: "assignee",
+        },
+        {
+          model: db.Type,
+          as: "type",
+        },
+        {
+          model: db.Status,
+          as: "status",
+          order: [["order", "ASC"]],
+        },
+        {
+          model: db.Priority,
+          as: "priority",
+          order: [["order", "DESC"]],
+        },
+      ],
+      order: [
+        [{ model: db.Status, as: "status" }, "order", "ASC"],
+        [{ model: db.Priority, as: "priority" }, "order", "DESC"],
+      ],
+    });
+
+    return tasks;
   }
 
   async getTasks(queryDto: QueryDto): Promise<any> {

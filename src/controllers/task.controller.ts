@@ -8,7 +8,7 @@ class TaskController {
 
   async getPersonalTasks(req: any, res: Response, next: NextFunction) {
     try {
-      const results = await taskService.getPersonalTasks(req.query);
+      const results = await taskService.getPersonalTasks(req.user.id);
       return res.status(StatusCodes.OK).send(results);
     } catch (err) {
       next(err);
@@ -38,8 +38,9 @@ class TaskController {
     }
   }
 
-  async createTask(req: Request, res: Response, next: NextFunction) {
+  async createTask(req: any, res: Response, next: NextFunction) {
     try {
+      req.body["creator_id"] = req.user.id;
       await taskService.createTask(req.body);
       return res.status(StatusCodes.CREATED).json({
         message: "Create task successfully",

@@ -6,15 +6,19 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(statusController.getStatuses)
-  .post(statusController.createStatus);
+  .get(auth(["admin", "user"]), statusController.getStatuses)
+  .post(auth(["admin"]), statusController.createStatus);
 
-router.put("/restore/:statusId", statusController.restoreStatusById);
+router.put(
+  "/restore/:statusId",
+  auth(["user"]),
+  statusController.restoreStatusById
+);
 
 router
   .route("/:statusId")
-  .get(statusController.getStatusById)
-  .put(statusController.updateStatusById)
-  .delete(statusController.deleteStatusById);
+  .get(auth(["admin"]), statusController.getStatusById)
+  .put(auth(["admin"]), statusController.updateStatusById)
+  .delete(auth(["admin"]), statusController.deleteStatusById);
 
 export default router;

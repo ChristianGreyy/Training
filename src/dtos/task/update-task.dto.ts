@@ -34,7 +34,7 @@ export default class CreateTaskDto {
   @IsOptional()
   @IsString()
   @MinLength(2)
-  @MaxLength(50)
+  @MaxLength(100)
   name!: string;
 
   @IsOptional()
