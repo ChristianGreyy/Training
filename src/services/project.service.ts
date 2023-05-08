@@ -33,44 +33,79 @@ class ProjectService {
       (personalProject: any) => personalProject.dataValues.id
     );
 
-    const projects = await db.Project.findAll({
-      where: {
-        id: personalProjectsId,
-      },
-      include: [
-        {
-          model: db.User,
-          as: "members",
+    let projects;
+
+    await client.connect();
+    // const cachedProjects = await client.hGetAll(`mt:projects:user:${user_id}`);
+
+    const cachedProjectsJSON = await client.SMEMBERS(
+      `mt:projects:users:${user_id}`
+    );
+
+    const cachedProjects = cachedProjectsJSON.map((project: any) =>
+      JSON.parse(project)
+    );
+
+    console.log(cachedProjects);
+
+    if (Object.keys(cachedProjects).length === 0) {
+      projects = await db.Project.findAll({
+        where: {
+          id: personalProjectsId,
         },
-        {
-          model: db.Task,
-          as: "tasks",
-          include: [
-            {
-              model: db.User,
-              as: "creator",
-              where: {
-                id: user_id,
+        include: [
+          {
+            model: db.User,
+            as: "members",
+          },
+          {
+            model: db.Task,
+            as: "tasks",
+            include: [
+              {
+                model: db.User,
+                as: "creator",
+                where: {
+                  id: user_id,
+                },
               },
-            },
-            {
-              model: db.Type,
-              as: "type",
-            },
-            {
-              model: db.Status,
-              as: "status",
-            },
-            {
-              model: db.Priority,
-              as: "priority",
-              order: [["order", "DESC"]],
-            },
-          ],
-          order: [[{ model: db.Priority }, "order", "DESC"]],
-        },
-      ],
-    });
+              {
+                model: db.Type,
+                as: "type",
+              },
+              {
+                model: db.Status,
+                as: "status",
+              },
+              {
+                model: db.Priority,
+                as: "priority",
+                order: [["order", "DESC"]],
+              },
+            ],
+            order: [[{ model: db.Priority }, "order", "DESC"]],
+          },
+        ],
+      });
+
+      for (let key in projects.dataValues) {
+        if (projects.dataValues[key] instanceof Date) {
+          projects.dataValues[key] = projects.dataValues[key].toISOString();
+        } else {
+          projects.dataValues[key] = projects.dataValues[key].toString();
+        }
+      }
+
+      await client.SADD(
+        `mt:projects:users:${user_id}`,
+        ...projects.map((project: any) => JSON.stringify(project))
+      );
+    } else {
+      projects = cachedProjects;
+    }
+
+    await client.disconnect();
+
     return projects;
   }
 
@@ -106,7 +141,6 @@ class ProjectService {
       }
       await client.HSET(`mt:users:${projectId}`, project.dataValues);
     } else {
-      console.log(cachedProject);
       project = cachedProject;
     }
     await client.disconnect();

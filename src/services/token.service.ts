@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import userService from "./user.service";
 import { StatusCodes } from "http-status-codes";
 import HttpException from "../configs/HttpException";
+import { Op } from "sequelize";
 const db = require("../models");
 
 class AuthService {
@@ -105,6 +106,23 @@ class AuthService {
       );
     }
     return tokenDoc;
+  }
+
+  async verifyVerifyCode(code: string | null) {
+    const codeDoc = await db.Token.findOne({
+      where: {
+        token: code,
+        expires: {
+          [Op.gt]: new Date(),
+        },
+      },
+    });
+
+    if (!codeDoc) {
+      throw new HttpException(StatusCodes.FORBIDDEN, "Invalid code or expires");
+    }
+
+    return codeDoc;
   }
 
   async refreshAccessToken(refreshToken: string) {

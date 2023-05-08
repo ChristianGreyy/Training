@@ -14,6 +14,7 @@ import IUser from "../interfaces/user.interface";
 import moment from "moment";
 import { Op } from "sequelize";
 import projectService from "./project.service";
+import VerifyCodeDto from "../dtos/auth/verify-code.dto";
 const db = require("../models/index.js");
 
 class AuthService {
@@ -53,24 +54,13 @@ class AuthService {
       console.log(error);
       throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
     }
-    const secret: string = process.env.SUPER_SECRET || "";
 
+    // user
     // Check code exists ?
-    const code = await db.Token.findOne({
-      where: {
-        expires: {
-          [Op.gt]: new Date(),
-        },
-      },
-    });
-
-    if (!code) {
-      throw new HttpException(StatusCodes.FORBIDDEN, "Invalid code or expires");
-    }
-
+    const codeDoc = await tokenService.verifyVerifyCode(registerDto.code);
     await db.Token.destroy({
       where: {
-        id: code.id,
+        id: codeDoc.id,
       },
     });
 
@@ -88,26 +78,15 @@ class AuthService {
         name: "user",
       },
     });
+
     registerDto["role_id"] = role.id;
-    const newUser = await userService.createUser(registerDto);
+    registerDto["code"] = null;
 
-    // Decode code
-    var bytes = crypto.AES.decrypt(registerDto.code, secret);
-    var decryptedData = JSON.parse(bytes.toString(crypto.enc.Utf8));
+    const newUser = await userService.createUser(registerDto, null);
+    // // Decode code
+    // var bytes = crypto.AES.decrypt(registerDto.code, secret);
+    // var decryptedData = JSON.parse(bytes.toString(crypto.enc.Utf8));
 
-    // Check project exists ?
-    const project = await projectService.getProjectById(
-      decryptedData.project_id
-    );
-
-    if (!project) {
-      throw new HttpException(StatusCodes.NOT_FOUND, "Project not found");
-    }
-
-    // Add user to project
-    await newUser.addProject(project, {
-      through: { role: decryptedData.role },
-    });
     return newUser;
   }
 
@@ -130,6 +109,24 @@ class AuthService {
     );
 
     return token;
+  }
+
+  async verifyInvite(verifyCodeDto: VerifyCodeDto): Promise<string> {
+    const error = await validation(VerifyCodeDto, verifyCodeDto);
+    if (error) {
+      throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
+    }
+    const user = await db.User.findOne({
+      where: {
+        code: verifyCodeDto.code,
+      },
+    });
+    console.log(user);
+    if (!user) {
+      throw new HttpException(StatusCodes.BAD_REQUEST, "Code is invalid");
+    }
+    user.code = null;
+    return await user.save();
   }
 }
 

@@ -8,7 +8,6 @@ const db = require("../models/index.js");
 export default function (roles: any) {
   return async function (req: any, res: Response, next: NextFunction) {
     const token = req.headers["authorization"];
-    // console.log(token);
     if (!token) {
       return next(new HttpException(StatusCodes.UNAUTHORIZED, "Unauthorized"));
     }
@@ -22,19 +21,20 @@ export default function (roles: any) {
       include: [
         {
           model: db.Role,
+          as: "role",
         },
       ],
     });
     if (!user) {
       return next(new HttpException(StatusCodes.UNAUTHORIZED, "Unauthorized"));
     }
-    const role = user.Role.name;
+    const role = user.role.name;
     // console.log(role);
     const checkRole = roles.includes(role);
     if (!checkRole) {
       return next(new HttpException(StatusCodes.FORBIDDEN, "Forbidden"));
     }
-    req.user = user;
+    req.user = user.dataValues;
 
     return next();
   };

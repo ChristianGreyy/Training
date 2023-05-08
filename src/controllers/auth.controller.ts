@@ -17,11 +17,12 @@ class UserController {
     }
   }
 
-  async register(req: Request, res: Response, next: NextFunction) {
+  async register(req: any, res: Response, next: NextFunction) {
     try {
-      await authService.register(req.body);
+      const newUser = await authService.register(req.body);
       return res.status(StatusCodes.CREATED).json({
         message: "Register successfully",
+        newUser,
       });
     } catch (err) {
       next(err);
@@ -44,12 +45,21 @@ class UserController {
   async createInvite(req: any, res: Response, next: NextFunction) {
     try {
       const code = await authService.createInvite({
-        project_id: req.body.project_id,
         user_id: req.user.id,
-        role: req.body.role,
       });
       return res.status(StatusCodes.CREATED).json({
         code,
+      });
+    } catch (err) {
+      return next(err);
+    }
+  }
+
+  async verifyInvite(req: any, res: Response, next: NextFunction) {
+    try {
+      const newUser = await authService.verifyInvite({ code: req.body.code });
+      return res.status(StatusCodes.CREATED).json({
+        newUser,
       });
     } catch (err) {
       return next(err);

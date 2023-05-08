@@ -2,6 +2,7 @@ const db = require("../index.js");
 
 export default async function (Model: any, filter: any, options: any) {
   let sort: any[] = [];
+  // ?sort=createdAt:desc
   if (options.sortBy) {
     options.sortBy.split(",").forEach((sortOption: any) => {
       const [key, order] = sortOption.split(":");
@@ -21,37 +22,30 @@ export default async function (Model: any, filter: any, options: any) {
 
   const countPromise = Model.count({ where: filter });
 
-  // example: {{url}}/api/v1/tasks?populate=User*creator,User*assignee,Project.Task
-  //     "results": [
-  //         {
-  //             "id": 3,
-  //             "creator": {
-  //                 "id": 11,
-  //             },
-  //             "assignee": {
-  //                 "id": 8,
-  //             },
-  //             "Project": {
-  //                 "id": 1,
-  //                 "Tasks": [
-  //                     {
-  //                         "id": 2,
-  //                     },
-  //                     {
-  //                         "id": 3,
-  //                     }
-  //                 ]
-  //             }
-  //         }
-  //     ],
   let populate: any[] = [];
   if (options.populate) {
     options.populate.split(",").forEach((populateOption: any) => {
       let item = populateOption
         .split(".")
         .reduce((acc: any, modelalias: any, index: number) => {
-          const model = modelalias.split("*")[0];
-          const alias = modelalias.split("*")[1];
+          const alias = modelalias;
+          let model: any;
+          if (
+            alias == "creator_id" ||
+            alias == "assignee_id" ||
+            alias == "members"
+          ) {
+            model = "User";
+          } else if (alias == "status") model = "Status";
+          else if (alias == "type") model = "Type";
+          else if (alias == "priority") model = "Priority";
+          else if (
+            alias == "creator_tasks" ||
+            alias == "assignee_tasks" ||
+            alias == "tasks"
+          ) {
+            model = "Task";
+          }
 
           if (index >= 1) {
             if (alias) {

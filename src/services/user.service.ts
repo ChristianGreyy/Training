@@ -8,6 +8,7 @@ import validation from "../middlewares/validation";
 import paginatePlugin from "../models/plugins/paginate.plugin";
 import pick from "../utils/pick";
 import QueryDto from "../dtos/query.dto";
+import authService from "./auth.service";
 const db = require("../models/index.js");
 
 class UserService {
@@ -23,7 +24,7 @@ class UserService {
     return user;
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<any> {
+  async createUser(createUserDto: CreateUserDto, userDoc: any): Promise<any> {
     const error = await validation(CreateUserDto, createUserDto);
     if (error) {
       throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
@@ -32,6 +33,12 @@ class UserService {
     const hashedPassword: string = await bcrypt.hash(password, 7);
     createUserDto["pass_word"] = hashedPassword;
 
+    if (userDoc != null) {
+      const code = await authService.createInvite({
+        user_id: userDoc.id,
+      });
+      createUserDto["code"] = code;
+    }
     return await db.User.create(createUserDto);
   }
 

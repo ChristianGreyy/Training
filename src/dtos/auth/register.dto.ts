@@ -23,7 +23,7 @@ export default class RegisterDto {
   @IsString()
   @MinLength(4)
   @MaxLength(100)
-  code!: string;
+  code!: string | null;
 
   @IsOptional()
   @IsInt()

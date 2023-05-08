@@ -2,6 +2,7 @@ import {
   IsDate,
   IsEnum,
   IsInt,
+  IsOptional,
   IsString,
   Matches,
   MaxLength,
@@ -19,6 +20,12 @@ enum Status {
 }
 
 export default class CreateUserDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(4)
+  @MaxLength(100)
+  code!: string | null;
+
   @IsInt()
   role_id!: number;
 

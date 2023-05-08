@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("active", "inactive"),
         defaultValue: "active",
       },
+      code: DataTypes.STRING,
     },
     {
       sequelize,
@@ -40,16 +41,17 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = (models) => {
     models.User.belongsTo(models.Role, {
       foreignKey: "role_id",
+      as: "role",
     });
 
     models.User.hasMany(models.Task, {
       foreignKey: "creator_id",
-      // as: "tasks",
+      as: "creator_tasks",
     });
 
     models.User.hasMany(models.Task, {
       foreignKey: "assignee_id",
-      // as: "tasks",
+      as: "assignee_tasks",
     });
 
     models.User.hasMany(models.Token, {

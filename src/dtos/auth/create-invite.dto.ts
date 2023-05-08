@@ -17,11 +17,5 @@ enum Role {
 
 export default class CreateInviteDto {
   @IsInt()
-  project_id!: string;
-
-  @IsInt()
   user_id!: string;
-
-  @IsEnum(Role, { message: "Invalid role of participant" })
-  role!: string;
 }

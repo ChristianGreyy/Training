@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "migration": "npx sequelize-cli db:migrate",
-    "migration:generate": "npx sequelize-cli migration:generate --name add-type-field-model",
+    "migration:generate": "npx sequelize-cli migration:generate --name add-code-to-user-model",
     "migration:undo": "npx sequelize-cli db:migrate:undo",
     "migration:status": "npx sequelize-cli db:migrate:status",
-    "migration:name": "npx sequelize-cli db:migrate --name 20230427082750-add-deletedAt-to-my-model.js",
+    "migration:name": "npx sequelize-cli db:migrate --name 20230427082750-add-code-to-my-user.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

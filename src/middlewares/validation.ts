@@ -17,18 +17,4 @@ export default async function (dto: any, body: any): Promise<any> {
     });
     return constraints;
   }
-
-  //   await validate(instanceBody).then((errors) => {
-  //     // errors is an array of validation errors
-  //     if (errors.length > 0) {
-  //       const constraints = errors.map((error: any) => {
-  //         return error.constraints;
-  //       });
-  //       console.log(constraints);
-  //       return constraints;
-  //     } else {
-  //       console.log("validation succeed");
-  //       return null;
-  //     }
-  //   });
 }

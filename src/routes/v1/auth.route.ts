@@ -12,5 +12,6 @@ router.post(
   auth(["admin", "user"]),
   authController.createInvite
 );
+router.post("/verify-invite", authController.verifyInvite);
 
 export default router;
