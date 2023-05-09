@@ -101,12 +101,12 @@ class AuthService {
       JSON.stringify(createInviteDto),
       secret
     ).toString();
-    await tokenService.saveToken(
-      token,
-      createInviteDto.user_id,
-      expire,
-      "invite"
-    );
+    // await tokenService.saveToken(
+    //   token,
+    //   createInviteDto.user_id,
+    //   expire,
+    //   "invite"
+    // );
 
     return token;
   }
@@ -118,14 +118,13 @@ class AuthService {
     }
     const user = await db.User.findOne({
       where: {
-        code: verifyCodeDto.code,
+        is_code_used: false,
       },
     });
-    console.log(user);
     if (!user) {
       throw new HttpException(StatusCodes.BAD_REQUEST, "Code is invalid");
     }
-    user.code = null;
+    user.is_code_used = true;
     return await user.save();
   }
 }

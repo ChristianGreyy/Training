@@ -68,12 +68,31 @@ class TaskService {
     if (error) {
       throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
     }
-    const project = await projectService.getProjectById(
-      createTaskDto.project_id.toString()
-    );
+    console.log(createTaskDto.project_id);
+
+    const project = await db.Project.findOne({
+      where: {
+        id: createTaskDto.project_id,
+      },
+      include: [
+        {
+          model: db.User,
+          as: "members",
+        },
+      ],
+    });
+
     if (!project) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Project not found");
     }
+
+    if (!project.members.includes(createTaskDto["creator_id"])) {
+      throw new HttpException(
+        StatusCodes.NOT_FOUND,
+        "User is not in this project"
+      );
+    }
+
     if (
       new Date(createTaskDto.start_date) > new Date(createTaskDto.end_date) ||
       new Date(createTaskDto.start_date) < new Date(project.start_date) ||

@@ -45,6 +45,8 @@ export default async function (Model: any, filter: any, options: any) {
             alias == "tasks"
           ) {
             model = "Task";
+          } else if (alias == "role") {
+            model = "Role";
           }
 
           if (index >= 1) {

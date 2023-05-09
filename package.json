@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "migration": "npx sequelize-cli db:migrate",
-    "migration:generate": "npx sequelize-cli migration:generate --name add-code-to-user-model",
+    "migration:generate": "npx sequelize-cli migration:generate --name add-isCodeUsed-to-user-model",
     "migration:undo": "npx sequelize-cli db:migrate:undo",
     "migration:status": "npx sequelize-cli db:migrate:status",
     "migration:name": "npx sequelize-cli db:migrate --name 20230427082750-add-code-to-my-user.js",

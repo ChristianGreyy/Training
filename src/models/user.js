@@ -31,6 +31,10 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "active",
       },
       code: DataTypes.STRING,
+      is_code_used: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       sequelize,

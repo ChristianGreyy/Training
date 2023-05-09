@@ -132,6 +132,7 @@ class ProjectService {
     if (Object.keys(cachedProject).length === 0) {
       project = await db.Project.findByPk(projectId);
 
+      // { key: 'value' }
       for (let key in project.dataValues) {
         if (project.dataValues[key] instanceof Date) {
           project.dataValues[key] = project.dataValues[key].toISOString();
@@ -219,7 +220,18 @@ class ProjectService {
       throw new HttpException(StatusCodes.MISDIRECTED_REQUEST, error);
     }
 
-    let project = await this.getProjectById(projectId);
+    // let project = await this.getProjectById(projectId);
+    const project = await db.Project.findOne({
+      where: {
+        id: projectId,
+      },
+      include: [
+        {
+          model: db.User,
+          as: "members",
+        },
+      ],
+    });
     if (!project) {
       throw new HttpException(StatusCodes.NOT_FOUND, "Project not found");
     }
